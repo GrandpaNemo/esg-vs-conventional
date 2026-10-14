@@ -1,0 +1,10 @@
+pandas>=2.2
+numpy>=1.26
+yfinance>=0.2.54
+requests>=2.31
+statsmodels>=0.14
+scipy>=1.11
+matplotlib>=3.8
+jupyter
+pytest
+openpyxl>=3.1

@@ -1,0 +1,73 @@
+fund_key,ticker,Sector,Weight,AsOf
+1,SWDA.L,Cash and/or Derivatives,0.0044,2026-10-08
+1,SWDA.L,Communication,0.0823,2026-10-08
+1,SWDA.L,Consumer Discretionary,0.0852,2026-10-08
+1,SWDA.L,Consumer Staples,0.0494,2026-10-08
+1,SWDA.L,Energy,0.042,2026-10-08
+1,SWDA.L,Financials,0.1543,2026-10-08
+1,SWDA.L,Health Care,0.0902,2026-10-08
+1,SWDA.L,Industrials,0.1063,2026-10-08
+1,SWDA.L,Information Technology,0.3187,2026-10-08
+1,SWDA.L,Materials,0.0311,2026-10-08
+1,SWDA.L,Real Estate,0.0147,2026-10-08
+1,SWDA.L,Utilities,0.023,2026-10-08
+2,SUSW.L,Cash and/or Derivatives,0.0034,2026-10-08
+2,SUSW.L,Communication,0.0795,2026-10-08
+2,SUSW.L,Consumer Discretionary,0.0953,2026-10-08
+2,SUSW.L,Consumer Staples,0.0548,2026-10-08
+2,SUSW.L,Energy,0.0,2026-10-08
+2,SUSW.L,Financials,0.1663,2026-10-08
+2,SUSW.L,Health Care,0.0935,2026-10-08
+2,SUSW.L,Industrials,0.1216,2026-10-08
+2,SUSW.L,Information Technology,0.3179,2026-10-08
+2,SUSW.L,Materials,0.035,2026-10-08
+2,SUSW.L,Real Estate,0.0171,2026-10-08
+2,SUSW.L,Utilities,0.0145,2026-10-08
+3,EGMW.L,Cash and/or Derivatives,,
+3,EGMW.L,Communication,,
+3,EGMW.L,Consumer Discretionary,,
+3,EGMW.L,Consumer Staples,,
+3,EGMW.L,Energy,,
+3,EGMW.L,Financials,,
+3,EGMW.L,Health Care,,
+3,EGMW.L,Industrials,,
+3,EGMW.L,Information Technology,,
+3,EGMW.L,Materials,,
+3,EGMW.L,Real Estate,,
+3,EGMW.L,Utilities,,
+5,VWRP.L,Cash and/or Derivatives,,
+5,VWRP.L,Communication,,
+5,VWRP.L,Consumer Discretionary,,
+5,VWRP.L,Consumer Staples,,
+5,VWRP.L,Energy,,
+5,VWRP.L,Financials,,
+5,VWRP.L,Health Care,,
+5,VWRP.L,Industrials,,
+5,VWRP.L,Information Technology,,
+5,VWRP.L,Materials,,
+5,VWRP.L,Real Estate,,
+5,VWRP.L,Utilities,,
+7,CSP1.L,Cash and/or Derivatives,,
+7,CSP1.L,Communication,,
+7,CSP1.L,Consumer Discretionary,,
+7,CSP1.L,Consumer Staples,,
+7,CSP1.L,Energy,,
+7,CSP1.L,Financials,,
+7,CSP1.L,Health Care,,
+7,CSP1.L,Industrials,,
+7,CSP1.L,Information Technology,,
+7,CSP1.L,Materials,,
+7,CSP1.L,Real Estate,,
+7,CSP1.L,Utilities,,
+8,SUUS.L,Cash and/or Derivatives,,
+8,SUUS.L,Communication,,
+8,SUUS.L,Consumer Discretionary,,
+8,SUUS.L,Consumer Staples,,
+8,SUUS.L,Energy,,
+8,SUUS.L,Financials,,
+8,SUUS.L,Health Care,,
+8,SUUS.L,Industrials,,
+8,SUUS.L,Information Technology,,
+8,SUUS.L,Materials,,
+8,SUUS.L,Real Estate,,
+8,SUUS.L,Utilities,,

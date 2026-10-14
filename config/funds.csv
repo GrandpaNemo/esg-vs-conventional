@@ -1,0 +1,9 @@
+fund_key,ticker,short_name,name,isin,provider,category,region,index_name,ter,benchmark_key,quote_currency_expected,notes
+1,SWDA.L,Core MSCI World,iShares Core MSCI World UCITS ETF USD (Acc),IE00B4L5Y983,iShares,Conventional,World,MSCI World,0.002,,GBp,TER per Sep 2026 factsheet
+2,SUSW.L,MSCI World SRI,iShares MSCI World SRI UCITS ETF EUR (Acc),IE00BYX2JD69,iShares,ESG,World,MSCI World SRI Select Reduced Fossil Fuel,0.002,1,EUR,LSE line quoted in EUR; TER per Sep 2026 factsheet
+3,EGMW.L,MSCI World ESG Enhanced,iShares MSCI World CTB Enhanced ESG UCITS ETF USD (Acc),IE00BHZPJ569,iShares,ESG,World,MSCI World ESG Enhanced Focus CTB,0.002,1,GBP,TER to fill from factsheet
+4,XZW0.L,Xtrackers MSCI World ESG,Xtrackers MSCI World ESG UCITS ETF 1C,IE00BZ02LR44,Xtrackers,ESG,World,MSCI World ESG Leaders Low Carbon ex Tobacco Involvement,0.002,1,USD,LSE line quoted in USD (XESW is the GBP line); check index name on factsheet
+5,VWRP.L,FTSE All-World,Vanguard FTSE All-World UCITS ETF (USD) Accumulating,IE00BK5BQT80,Vanguard,Conventional,Global All Cap,FTSE All-World,0.0014,,GBP,TER to fill from factsheet
+6,V3AB.L,ESG Global All Cap,Vanguard ESG Global All Cap UCITS ETF (USD) Accumulating,IE00BNG8L278,Vanguard,ESG,Global All Cap,FTSE Global All Cap Choice,0.0024,5,GBP,Launched March 2021; TER per Vanguard UK page
+7,CSP1.L,Core S&P 500,iShares Core S&P 500 UCITS ETF USD (Acc),IE00B5BMR087,iShares,Conventional,USA,S&P 500,0.0007,,GBp,TER to fill from factsheet
+8,SUUS.L,MSCI USA SRI,iShares MSCI USA SRI UCITS ETF USD (Acc),IE00BYVJRR92,iShares,ESG,USA,MSCI USA SRI Select Reduced Fossil Fuel,0.002,7,GBp,TER to fill from factsheet

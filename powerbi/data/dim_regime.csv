@@ -1,0 +1,6 @@
+Regime,RegimeOrder,StartMonth,EndMonth,Description
+1. Pre-COVID,1,,2020-01-31,"Steady growth, low rates"
+2. COVID crash,2,2020-02-29,2020-04-30,Global sell-off and rebound start
+3. Recovery,3,2020-05-31,2021-12-31,"Stimulus-driven rally, tech-led"
+4. Energy & inflation shock,4,2022-01-31,2022-12-31,"War in Ukraine, energy prices spike, rates rise fast"
+5. 2023 onwards,5,2023-01-31,,"Rate peak, AI-led rally"

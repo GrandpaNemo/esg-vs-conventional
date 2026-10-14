@@ -1,0 +1,6 @@
+__pycache__/
+.ipynb_checkpoints/
+.pytest_cache/
+.venv/
+# raw downloads are re-creatable with `python -m src.build_dataset`
+data/raw/*.csv

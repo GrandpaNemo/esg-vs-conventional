@@ -1,0 +1,325 @@
+// =========================================================================
+//  ESG vs Conventional Funds - DAX measures
+//  Where to put them: in the web model editor, select the table
+//  fact_returns_monthly > New measure, and paste one block at a time.
+//  (Optional tidy-up: New table  _Measures = ROW ( "x", 1 ), put the
+//  measures there instead, and hide column x.)
+//
+//  Table names assumed:  fact_returns_monthly, dim_date, dim_fund,
+//                        fact_sector_weights
+//  All returns are monthly simple returns in decimals, in GBP.
+//
+//  Formulas match src/powerbi_export.py::metrics(), so metrics_check.csv
+//  tells you whether each measure is right.
+// =========================================================================
+
+
+// ---------- 1. Basic building blocks ------------------------------------
+
+Month Count =
+COUNTROWS ( fact_returns_monthly )
+
+Cumulative Return =
+IF (
+    [Month Count] > 0,
+    PRODUCTX ( fact_returns_monthly, 1 + fact_returns_monthly[Return] ) - 1
+)
+
+// Annualised. Blank for under 12 months: annualising a 3-month return
+// (e.g. the COVID crash) gives silly numbers. Use Cumulative Return there.
+CAGR =
+VAR n = [Month Count]
+RETURN
+    IF ( n >= 12, ( 1 + [Cumulative Return] ) ^ ( 12 / n ) - 1 )
+
+// STDEV.S needs at least 2 values, so every volatility-type measure is guarded.
+Ann. Volatility =
+IF (
+    COUNT ( fact_returns_monthly[Return] ) >= 2,
+    STDEV.S ( fact_returns_monthly[Return] ) * SQRT ( 12 )
+)
+
+
+// ---------- 2. Risk-adjusted returns (risk-free = SONIA) -----------------
+
+Sharpe Ratio =
+IF (
+    COUNT ( fact_returns_monthly[ExcessReturn] ) >= 2,
+    DIVIDE (
+        AVERAGE ( fact_returns_monthly[ExcessReturn] ),
+        STDEV.S ( fact_returns_monthly[ExcessReturn] )
+    ) * SQRT ( 12 )
+)
+
+// Only months below the risk-free rate count as "risk".
+Downside Deviation =
+SQRT (
+    AVERAGEX (
+        fact_returns_monthly,
+        POWER ( MIN ( fact_returns_monthly[ExcessReturn], 0 ), 2 )
+    )
+) * SQRT ( 12 )
+
+Sortino Ratio =
+DIVIDE ( AVERAGE ( fact_returns_monthly[ExcessReturn] ) * 12, [Downside Deviation] )
+
+
+// ---------- 3. Growth and drawdown (respect the date slicer) -------------
+// Put dim_date[Date] (or any dim_date column) on the x-axis.
+// ALLSELECTED keeps the slicer range; KEEPFILTERS adds "up to this month".
+
+Growth of £10k =
+VAR d = MAX ( dim_date[Date] )
+RETURN
+    IF (
+        NOT ISEMPTY ( fact_returns_monthly ),
+        10000
+            * CALCULATE (
+                PRODUCTX ( fact_returns_monthly, 1 + fact_returns_monthly[Return] ),
+                ALLSELECTED ( dim_date ),
+                KEEPFILTERS ( dim_date[Date] <= d )
+            )
+    )
+
+// How far below its previous peak the £10k is this month (0 = at a high).
+// The £10,000 starting value counts as a peak.
+Drawdown =
+VAR d = MAX ( dim_date[Date] )
+VAR g = [Growth of £10k]
+VAR peak =
+    MAXX (
+        CALCULATETABLE (
+            VALUES ( dim_date[Date] ),
+            ALLSELECTED ( dim_date ),
+            KEEPFILTERS ( dim_date[Date] <= d )
+        ),
+        [Growth of £10k]
+    )
+RETURN
+    IF ( NOT ISBLANK ( g ), MIN ( DIVIDE ( g, MAX ( peak, 10000 ) ) - 1, 0 ) )
+
+Max Drawdown =
+MINX (
+    CALCULATETABLE ( VALUES ( dim_date[Date] ), ALLSELECTED ( dim_date ) ),
+    [Drawdown]
+)
+
+
+// ---------- 4. Versus the conventional benchmark (ESG funds only) --------
+// BenchmarkReturn is blank for the conventional funds, so these show blank
+// for them. Use with the visual filter in_pair_period = 1.
+
+Benchmark Cumulative Return =
+VAR t =
+    FILTER ( fact_returns_monthly, NOT ISBLANK ( fact_returns_monthly[BenchmarkReturn] ) )
+VAR n = COUNTROWS ( t )
+RETURN
+    IF ( n > 0 && n = [Month Count],
+         PRODUCTX ( t, 1 + fact_returns_monthly[BenchmarkReturn] ) - 1 )
+
+Benchmark CAGR =
+VAR n = [Month Count]
+VAR c = [Benchmark Cumulative Return]
+RETURN
+    IF ( n >= 12 && NOT ISBLANK ( c ), ( 1 + c ) ^ ( 12 / n ) - 1 )
+
+// Like-for-like benchmark versions. On an ESG fund's rows these use the
+// benchmark's return for the SAME months, so the comparison is automatically
+// over the pair period - no need to line up start dates by hand.
+
+Benchmark Ann. Volatility =
+IF (
+    COUNT ( fact_returns_monthly[BenchmarkReturn] ) >= 2,
+    STDEV.S ( fact_returns_monthly[BenchmarkReturn] ) * SQRT ( 12 )
+)
+
+Benchmark Sharpe Ratio =
+VAR t =
+    FILTER ( fact_returns_monthly, NOT ISBLANK ( fact_returns_monthly[BenchmarkReturn] ) )
+RETURN
+    IF (
+        COUNTROWS ( t ) >= 2,
+        DIVIDE (
+            AVERAGEX ( t, fact_returns_monthly[BenchmarkReturn] - fact_returns_monthly[RF] ),
+            STDEVX.S ( t, fact_returns_monthly[BenchmarkReturn] - fact_returns_monthly[RF] )
+        ) * SQRT ( 12 )
+    )
+
+Sharpe Gap vs Benchmark =
+VAR b = [Benchmark Sharpe Ratio]
+RETURN IF ( NOT ISBLANK ( b ), [Sharpe Ratio] - b )
+
+Benchmark Growth of £10k =
+VAR d = MAX ( dim_date[Date] )
+RETURN
+    IF (
+        NOT ISEMPTY ( fact_returns_monthly ),
+        10000
+            * CALCULATE (
+                PRODUCTX (
+                    FILTER ( fact_returns_monthly, NOT ISBLANK ( fact_returns_monthly[BenchmarkReturn] ) ),
+                    1 + fact_returns_monthly[BenchmarkReturn]
+                ),
+                ALLSELECTED ( dim_date ),
+                KEEPFILTERS ( dim_date[Date] <= d )
+            )
+    )
+
+Benchmark Drawdown =
+VAR d = MAX ( dim_date[Date] )
+VAR g = [Benchmark Growth of £10k]
+VAR peak =
+    MAXX (
+        CALCULATETABLE (
+            VALUES ( dim_date[Date] ),
+            ALLSELECTED ( dim_date ),
+            KEEPFILTERS ( dim_date[Date] <= d )
+        ),
+        [Benchmark Growth of £10k]
+    )
+RETURN
+    IF ( NOT ISBLANK ( g ), MIN ( DIVIDE ( g, MAX ( peak, 10000 ) ) - 1, 0 ) )
+
+Benchmark Max Drawdown =
+MINX (
+    CALCULATETABLE ( VALUES ( dim_date[Date] ), ALLSELECTED ( dim_date ) ),
+    [Benchmark Drawdown]
+)
+
+Return Gap vs Benchmark =
+VAR b = [Benchmark Cumulative Return]
+RETURN IF ( NOT ISBLANK ( b ), [Cumulative Return] - b )
+
+CAGR Gap vs Benchmark =
+VAR b = [Benchmark CAGR]
+RETURN IF ( NOT ISBLANK ( b ), [CAGR] - b )
+
+// Annualised standard deviation of the monthly return difference.
+Tracking Error =
+IF (
+    COUNT ( fact_returns_monthly[ActiveReturn] ) >= 2,
+    STDEV.S ( fact_returns_monthly[ActiveReturn] ) * SQRT ( 12 )
+)
+
+Information Ratio =
+DIVIDE ( AVERAGE ( fact_returns_monthly[ActiveReturn] ) * 12, [Tracking Error] )
+
+Beta vs Benchmark =
+VAR t =
+    FILTER ( fact_returns_monthly, NOT ISBLANK ( fact_returns_monthly[BenchmarkReturn] ) )
+VAR mr = AVERAGEX ( t, fact_returns_monthly[Return] )
+VAR mb = AVERAGEX ( t, fact_returns_monthly[BenchmarkReturn] )
+RETURN
+    DIVIDE (
+        SUMX ( t, ( fact_returns_monthly[Return] - mr ) * ( fact_returns_monthly[BenchmarkReturn] - mb ) ),
+        SUMX ( t, ( fact_returns_monthly[BenchmarkReturn] - mb ) ^ 2 )
+    )
+
+Correlation vs Benchmark =
+VAR t =
+    FILTER ( fact_returns_monthly, NOT ISBLANK ( fact_returns_monthly[BenchmarkReturn] ) )
+VAR mr = AVERAGEX ( t, fact_returns_monthly[Return] )
+VAR mb = AVERAGEX ( t, fact_returns_monthly[BenchmarkReturn] )
+VAR cov = SUMX ( t, ( fact_returns_monthly[Return] - mr ) * ( fact_returns_monthly[BenchmarkReturn] - mb ) )
+VAR vr = SUMX ( t, ( fact_returns_monthly[Return] - mr ) ^ 2 )
+VAR vb = SUMX ( t, ( fact_returns_monthly[BenchmarkReturn] - mb ) ^ 2 )
+RETURN DIVIDE ( cov, SQRT ( vr * vb ) )
+
+// Share of months in which the ESG fund beat its benchmark.
+Win Rate vs Benchmark =
+VAR t =
+    FILTER ( fact_returns_monthly, NOT ISBLANK ( fact_returns_monthly[ActiveReturn] ) )
+RETURN
+    DIVIDE ( COUNTROWS ( FILTER ( t, fact_returns_monthly[ActiveReturn] > 0 ) ), COUNTROWS ( t ) )
+
+
+// ---------- 5. Rolling windows (for line charts over dim_date[Date]) -----
+// EOMONTH (not EDATE) so that February month-ends count exactly 12 months.
+
+Rolling 12M Return =
+VAR d = MAX ( dim_date[Date] )
+VAR t =
+    CALCULATETABLE (
+        fact_returns_monthly,
+        ALL ( dim_date ),
+        dim_date[Date] <= d,
+        dim_date[Date] > EOMONTH ( d, -12 )
+    )
+RETURN
+    IF ( COUNTROWS ( t ) = 12, PRODUCTX ( t, 1 + fact_returns_monthly[Return] ) - 1 )
+
+Rolling 36M Sharpe =
+VAR d = MAX ( dim_date[Date] )
+VAR t =
+    CALCULATETABLE (
+        fact_returns_monthly,
+        ALL ( dim_date ),
+        dim_date[Date] <= d,
+        dim_date[Date] > EOMONTH ( d, -36 )
+    )
+RETURN
+    IF (
+        COUNTROWS ( t ) = 36,
+        DIVIDE (
+            AVERAGEX ( t, fact_returns_monthly[ExcessReturn] ),
+            STDEVX.S ( t, fact_returns_monthly[ExcessReturn] )
+        ) * SQRT ( 12 )
+    )
+
+Rolling 12M Gap vs Benchmark =
+VAR d = MAX ( dim_date[Date] )
+VAR t =
+    CALCULATETABLE (
+        fact_returns_monthly,
+        ALL ( dim_date ),
+        dim_date[Date] <= d,
+        dim_date[Date] > EOMONTH ( d, -12 )
+    )
+VAR tb = FILTER ( t, NOT ISBLANK ( fact_returns_monthly[BenchmarkReturn] ) )
+RETURN
+    IF (
+        COUNTROWS ( tb ) = 12,
+        ( PRODUCTX ( tb, 1 + fact_returns_monthly[Return] ) - 1 )
+            - ( PRODUCTX ( tb, 1 + fact_returns_monthly[BenchmarkReturn] ) - 1 )
+    )
+
+
+// ---------- 6. Sector exposure (needs fact_sector_weights filled in) -----
+
+Sector Weight =
+SUM ( fact_sector_weights[Weight] )
+
+Benchmark Sector Weight =
+VAR b = SELECTEDVALUE ( dim_fund[benchmark_key] )
+RETURN
+    IF (
+        NOT ISBLANK ( b ),
+        CALCULATE ( SUM ( fact_sector_weights[Weight] ),
+                    REMOVEFILTERS ( dim_fund ),
+                    fact_sector_weights[fund_key] = b )
+    )
+
+Sector Tilt vs Benchmark =
+VAR b = [Benchmark Sector Weight]
+RETURN IF ( NOT ISBLANK ( b ), [Sector Weight] - b )
+
+
+// ---------- 7. Labels for titles and cards -------------------------------
+
+Selected Period =
+VAR mn = CALCULATE ( MIN ( fact_returns_monthly[Date] ) )
+VAR mx = CALCULATE ( MAX ( fact_returns_monthly[Date] ) )
+RETURN FORMAT ( mn, "mmm yyyy" ) & " – " & FORMAT ( mx, "mmm yyyy" )
+
+Fund TER =
+SELECTEDVALUE ( dim_fund[ter] )
+
+Headline Gap Text =
+VAR g = [CAGR Gap vs Benchmark]
+RETURN
+    IF (
+        ISBLANK ( g ),
+        "Select one ESG fund",
+        IF ( g >= 0, "Ahead of", "Behind" ) & " its benchmark by "
+            & FORMAT ( ABS ( g ), "0.0%" ) & " a year"
+    )

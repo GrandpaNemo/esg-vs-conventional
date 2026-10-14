@@ -1,0 +1,28 @@
+{
+  "name": "ESG vs Conventional",
+  "dataColors": ["#008300", "#2a78d6", "#eb6834", "#4a3aa7", "#e34948", "#1baf7a", "#eda100", "#e87ba4"],
+  "good": "#008300",
+  "neutral": "#eda100",
+  "bad": "#e34948",
+  "maximum": "#2a78d6",
+  "center": "#f0efec",
+  "minimum": "#e34948",
+  "background": "#fcfcfb",
+  "foreground": "#0b0b0b",
+  "tableAccent": "#2a78d6",
+  "textClasses": {
+    "title": { "fontFace": "Segoe UI Semibold", "fontSize": 14, "color": "#0b0b0b" },
+    "header": { "fontFace": "Segoe UI Semibold", "fontSize": 12, "color": "#0b0b0b" },
+    "label": { "fontFace": "Segoe UI", "fontSize": 10, "color": "#52514e" },
+    "callout": { "fontFace": "Segoe UI Light", "fontSize": 28, "color": "#0b0b0b" }
+  },
+  "visualStyles": {
+    "*": { "*": {
+      "border": [{ "show": false }],
+      "background": [{ "show": true, "color": { "solid": { "color": "#ffffff" } }, "transparency": 0 }],
+      "valueAxis": [{ "gridlineColor": { "solid": { "color": "#e8e7e3" } }, "gridlineThickness": 1 }]
+    } },
+    "lineChart": { "*": { "lineStyles": [{ "strokeWidth": 2, "showMarker": false }] } },
+    "page": { "*": { "background": [{ "color": { "solid": { "color": "#f4f3f0" } }, "transparency": 0 }] } }
+  }
+}

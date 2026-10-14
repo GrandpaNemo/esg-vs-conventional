@@ -1,0 +1,22 @@
+# Data quality log
+
+- SWDA.L: 77 missing weekday(s) (includes UK holidays), longest run 2
+- SUSW.L: 77 missing weekday(s) (includes UK holidays), longest run 2
+- SUSW.L: quoted in EUR, converted to GBP at daily FX
+- EGMW.L: 62 missing weekday(s) (includes UK holidays), longest run 2
+- XZW0.L: 71 missing weekday(s) (includes UK holidays), longest run 2
+- XZW0.L: quoted in USD, converted to GBP at daily FX
+- VWRP.L: 63 missing weekday(s) (includes UK holidays), longest run 2
+- V3AB.L: 51 missing weekday(s) (includes UK holidays), longest run 2
+- CSP1.L: 78 missing weekday(s) (includes UK holidays), longest run 2
+- SUUS.L: 78 missing weekday(s) (includes UK holidays), longest run 2
+- 8 day(s) with a move above 8% in at least one fund; see large_moves.csv and check that both funds moved together
+- SWDA.L: Oct 2017 to Sep 2026 (108 months)
+- SUSW.L: Nov 2017 to Sep 2026 (107 months)
+- EGMW.L: Dec 2019 to Sep 2026 (82 months)
+- XZW0.L: May 2018 to Sep 2026 (101 months)
+- VWRP.L: Aug 2019 to Sep 2026 (86 months)
+- V3AB.L: Apr 2021 to Sep 2026 (66 months)
+- CSP1.L: Oct 2017 to Sep 2026 (108 months)
+- SUUS.L: Oct 2017 to Sep 2026 (108 months)
+- Common period (all funds): from Apr 2021
